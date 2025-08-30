@@ -5,12 +5,9 @@ pub mod state;
 pub mod errors;
 pub mod events;
 pub mod constants;
+pub mod utils;
 
 use instructions::*;
-// use state::*;
-// use errors::*;
-// use events::*;
-// use constants::*;
 
 declare_id!("76hLS4VrVptrteJAK1imstSGQt5kzinqt33GVoiSZPB2");
 
@@ -20,6 +17,10 @@ pub mod stake_program {
 
     pub fn initialize(ctx: Context<Initialize>, community_wallet: Pubkey) -> Result<()> {
         instructions::initialize::handler(ctx, community_wallet)
+    }
+
+    pub fn set_pause(ctx: Context<SetPause>, paused: bool) -> Result<()> {
+    ctx.accounts.set_pause(paused)
     }
 
     // pub fn stake(ctx: Context<Stake>, amount: u64) -> Result<()> {
@@ -34,7 +35,4 @@ pub mod stake_program {
     //     instructions::claim_rewards::handler(ctx)
     // }
 
-    // pub fn set_paused(ctx: Context<SetPaused>, paused: bool) -> Result<()> {
-    //     instructions::set_paused::handler(ctx, paused)
-    // }
 }

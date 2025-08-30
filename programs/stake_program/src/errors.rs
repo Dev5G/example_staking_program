@@ -1,13 +1,6 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum ErrorCode {
-    #[msg("Custom error message")]
-    CustomError,
-}
-
-
-#[error_code]
 pub enum StakingError {
     #[msg("Nothing to unstake.")]
     NothingToUnstake,
@@ -23,8 +16,6 @@ pub enum StakingError {
     VaultOwnershipMismatch,
     #[msg("Action already in progress. Try again.")]
     AlreadyProcessing,
-    #[msg("The contract is currently paused.")]
-    ContractPaused,
     #[msg("Unauthorized access.")]
     Unauthorized,
     #[msg("Incompatible config version.")]
@@ -32,3 +23,39 @@ pub enum StakingError {
     #[msg("Math overflow or conversion failed.")]
     MathOverflow,
 }
+
+#[error_code]
+pub enum PoolError {
+    #[msg("Pool is already initialized.")]
+    AlreadyInitialized,
+    #[msg("Pool is not initialized.")]
+    NotInitialized,
+    #[msg("Invalid pool state.")]
+    InvalidPoolState,
+    #[msg("Pool has reached its maximum capacity.")]
+    PoolFull,
+    #[msg("Pool is empty.")]
+    PoolEmpty,
+}
+
+#[error_code]
+pub enum ConfigError {
+    #[msg("The contract is currently paused.")]
+    ContractPaused,
+    #[msg("Config is already initialized.")]
+    AlreadyInitialized,
+    #[msg("Config is not initialized.")]
+    NotInitialized,
+    #[msg("Invalid config state.")]
+    InvalidConfigState,
+    #[msg("Invalid community wallet address.")]
+    InvalidCommunityWallet,
+}
+#[error_code]
+pub enum AuthError {
+    #[msg("Unauthorized: Only the authority can perform this action.")]
+    Unauthorized,
+    #[msg("Incompatible config version.")]
+    VersionMismatch,
+}
+

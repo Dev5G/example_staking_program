@@ -54,6 +54,7 @@ pub struct Initialize<'info> {
 }
 
 pub fn handler(ctx: Context<Initialize>, community_wallet: Pubkey) -> Result<()> {
+    
     ctx.accounts.config.version = 1;
     ctx.accounts.config.authority = ctx.accounts.authority.key();
     ctx.accounts.config.paused = false;
