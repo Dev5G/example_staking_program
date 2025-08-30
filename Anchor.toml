@@ -12,7 +12,7 @@ stake_program = "76hLS4VrVptrteJAK1imstSGQt5kzinqt33GVoiSZPB2"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

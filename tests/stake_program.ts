@@ -7,10 +7,19 @@ describe("stake_program", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.stakeProgram as Program<StakeProgram>;
+  const provider = program.provider as anchor.AnchorProvider;
+  const payer = provider.wallet;
 
+  const communityWallet = anchor.web3.Keypair.generate();
   it("Is initialized!", async () => {
     // Add your test here.
-    const tx = await program.methods.initialize().rpc();
-    console.log("Your transaction signature", tx);
+    // const tx = await program.methods.initialize(
+      
+    // ).rpc();
+    // console.log("Your transaction signature", tx);
+
+    console.log("Program ID: ", program.programId.toString());
+    console.log("Payer: ", payer.publicKey.toString());
+    console.log("Community Wallet: ", communityWallet.publicKey.toString());
   });
 });
