@@ -23,9 +23,9 @@ pub mod stake_program {
     ctx.accounts.set_pause(paused)
     }
 
-    // pub fn stake(ctx: Context<Stake>, amount: u64) -> Result<()> {
-    //     instructions::stake::handler(ctx, amount)
-    // }
+    pub fn stake(ctx: Context<Stake>, amount: u64) -> Result<()> {
+        instructions::stake::handler(ctx, amount)
+    }
 
     // pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
     //     instructions::unstake::handler(ctx)

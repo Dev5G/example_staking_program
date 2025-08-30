@@ -8,12 +8,16 @@ pub enum StakingError {
     NothingToClaim,
     #[msg("Insufficient funds in pool.")]
     InsufficientFundsInPool,
+    #[msg("Insufficient funds in wallet.")]
+    InsufficientFundsInWallet,
     #[msg("Invalid stake amount.")]
     InvalidStakeAmount,
     #[msg("Vault has insufficient funds.")]
     VaultInsufficientBalance,
     #[msg("Vault ATA is not owned by config PDA.")]
     VaultOwnershipMismatch,
+    #[msg("Vault mint does not match the config mint.")]
+    VaultMintMismatch,
     #[msg("Action already in progress. Try again.")]
     AlreadyProcessing,
     #[msg("Unauthorized access.")]
