@@ -5,10 +5,10 @@ use anchor_spl::{
 };
 
 use crate::{
-    constants::{CONFIG_SEED, POOL_SEED, STATE_SEED, VAULT_SEED}, errors::{ConfigError, StakingError}, events::StakeEvent, state::{Config, StakingPool, UserState}, utils::token_transfer 
+    constants::{CONFIG_SEED, POOL_SEED, STATE_SEED}, errors::{ConfigError, StakingError}, events::StakeEvent, state::{Config, StakingPool, UserState}, utils::token_transfer 
 };
 
-pub fn handler(ctx: Context<Stake>, amount: u64) -> Result<()> {
+pub fn stake_handler(ctx: Context<Stake>, amount: u64) -> Result<()> {
     // --- Security checks ---
     require!(!ctx.accounts.config.paused, ConfigError::ContractPaused);
     require!(amount > 0, StakingError::InvalidStakeAmount);
@@ -16,7 +16,7 @@ pub fn handler(ctx: Context<Stake>, amount: u64) -> Result<()> {
     // --- Transfer tokens into vault using utility ---
     token_transfer(
         &ctx.accounts.from,
-        &ctx.accounts.vault,
+        &ctx.accounts.pool_vault,
         &ctx.accounts.user, // authority = staker
         &ctx.accounts.token_program,
         amount,
@@ -25,6 +25,7 @@ pub fn handler(ctx: Context<Stake>, amount: u64) -> Result<()> {
     // --- Update user + pool state ---
     let clock = Clock::get()?;
     if ctx.accounts.user_state.amount == 0 {
+        ctx.accounts.user_state.locked = false; //  to prevent re-entrancy
         ctx.accounts.user_state.authority = ctx.accounts.user.key();
     }
     ctx.accounts.user_state.amount = ctx
@@ -37,8 +38,7 @@ pub fn handler(ctx: Context<Stake>, amount: u64) -> Result<()> {
     ctx.accounts.user_state.last_tax_snapshot = ctx.accounts.pool.total_tax_collected;
     
 
-    ctx.accounts.user_state.locked = true; // Lock on stake
-
+    
     ctx.accounts.pool.total_staked = ctx
         .accounts
         .pool
@@ -97,15 +97,13 @@ pub struct Stake<'info> {
     )]
     pub from: Box<Account<'info, TokenAccount>>,
 
-    /// Vault PDA ATA (owned by config PDA)
+    /// Pool Vault ATA (owned by pool PDA)
     #[account(
         mut,
-        seeds = [VAULT_SEED, config.key().as_ref(), config.token_mint.as_ref()],
-        bump,
-        constraint = vault.mint == config.token_mint @ StakingError::VaultMintMismatch,
-        constraint = vault.owner == config.key() @   StakingError::VaultOwnershipMismatch,
+        associated_token::mint = config.token_mint,
+        associated_token::authority = pool
     )]
-    pub vault: Box<Account<'info, TokenAccount>>,
+    pub pool_vault: Box<Account<'info, TokenAccount>>,
 
     /// Programs
     pub associated_token_program: Program<'info, AssociatedToken>,

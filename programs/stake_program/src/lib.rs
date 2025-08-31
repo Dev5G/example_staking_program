@@ -9,7 +9,7 @@ pub mod utils;
 
 use instructions::*;
 
-declare_id!("76hLS4VrVptrteJAK1imstSGQt5kzinqt33GVoiSZPB2");
+declare_id!("79Wno3MHuSPo9dWQSDdXK1woSPx8ndHhqRmbpfCvhvdp");
 
 #[program]
 pub mod stake_program {
@@ -24,7 +24,7 @@ pub mod stake_program {
     }
 
     pub fn stake(ctx: Context<Stake>, amount: u64) -> Result<()> {
-        instructions::stake::handler(ctx, amount)
+        instructions::stake::stake_handler(ctx, amount)
     }
 
     // pub fn unstake(ctx: Context<Unstake>) -> Result<()> {

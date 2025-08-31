@@ -1,10 +1,13 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, TokenAccount, Token};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::{Mint, TokenAccount, Token}
+};
 
 use crate::{
     state::{Config, StakingPool},
     events::InitializedEvent,
-    constants::{CONFIG_SEED, POOL_SEED, VAULT_SEED},
+    constants::{CONFIG_SEED, POOL_SEED},
 };
 
 #[derive(Accounts)]
@@ -30,13 +33,17 @@ pub struct Initialize<'info> {
     #[account(
         init,
         payer = payer,
-        seeds = [VAULT_SEED, config.key().as_ref(), token_mint.key().as_ref()],
-        bump,
-        token::mint = token_mint,
-        token::authority = config, // PDA authority for vault
+        associated_token::mint = token_mint,
+        associated_token::authority = pool, // PDA authority for vault
     )]
-    pub vault: Box<Account<'info, TokenAccount>>,
-
+    pub pool_vault: Box<Account<'info, TokenAccount>>,
+    #[account(
+        init,
+        payer = payer,
+        associated_token::mint = token_mint,
+        associated_token::authority = config, // PDA authority for vault
+    )]
+    pub reward_vault: Box<Account<'info, TokenAccount>>,
     /// Pays rent + allocation fees
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -50,7 +57,7 @@ pub struct Initialize<'info> {
 
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 pub fn handler(ctx: Context<Initialize>, community_wallet: Pubkey) -> Result<()> {
