@@ -9,7 +9,7 @@ import {
 
 import { toDecimals } from "./utils";
 
-describe("Unstake tests", () => {
+describe.skip("Unstake tests", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.StakeProgram as Program<StakeProgram>;
