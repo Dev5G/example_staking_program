@@ -15,7 +15,7 @@ pub fn unstake_handler(ctx: Context<Unstake>) -> Result<()> {
     // --- Security checks ---
     require_eq!(ctx.accounts.config.version, 1, StakingError::VersionMismatch);
     require!(!ctx.accounts.config.paused, ConfigError::ContractPaused);
-    // require!(!ctx.accounts.user_state.locked, StakingError::AlreadyProcessing);
+    require!(!ctx.accounts.user_state.locked, StakingError::AlreadyProcessing);
 
     let now = Clock::get()?.unix_timestamp;
     let amount = ctx.accounts.user_state.amount;
