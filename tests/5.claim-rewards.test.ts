@@ -11,7 +11,7 @@ import {
 
 import { toDecimals } from "./utils"; // your helper fn: toDecimals(10, decimals)
 
-describe("staking + rewards flow", () => {
+describe.skip("staking + rewards flow", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 

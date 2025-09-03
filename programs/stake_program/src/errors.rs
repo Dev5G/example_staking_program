@@ -36,6 +36,8 @@ pub enum PoolError {
     NotInitialized,
     #[msg("Invalid pool state.")]
     InvalidPoolState,
+    #[msg("Invalid pool reward amount added.")]
+    InvalidPoolRewardAmountAdded,
     #[msg("Pool has reached its maximum capacity.")]
     PoolFull,
     #[msg("Pool is empty.")]

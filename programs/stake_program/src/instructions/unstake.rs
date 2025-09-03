@@ -165,6 +165,7 @@ pub struct Unstake<'info> {
     #[account(
         constraint = community_wallet.key() == config.community_wallet @ ConfigError::InvalidCommunityWallet
     )]
+    pub community_wallet: UncheckedAccount<'info>,
     /// Community wallet ATA to receive tax
     #[account(
         mut,
@@ -172,7 +173,6 @@ pub struct Unstake<'info> {
         associated_token::authority = community_wallet.key(),
     )]
     pub community_ata: Box<Account<'info, TokenAccount>>,
-    pub community_wallet: UncheckedAccount<'info>,
     /// Programs
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,

@@ -6,8 +6,8 @@ use anchor_spl::{
 
 use crate::{
     constants::{CONFIG_SEED, POOL_SEED, STATE_SEED}, 
-    errors::{ConfigError, StakingError}, 
-    events::ClaimRewardsEvent,
+    errors::{ConfigError, StakingError, PoolError}, 
+    events::{ClaimRewardsEvent, ManualRewardAddedEvent},
     state::{Config, StakingPool, UserState}, 
 };
 pub fn claim_handler(ctx: Context<ClaimRewards>) -> Result<()> {
@@ -129,5 +129,77 @@ pub struct ClaimRewards<'info> {
     /// Programs
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+}
+
+
+pub fn add_rewards_handler(ctx: Context<AddRewards>, amount: u64) -> Result<()> {
+    require!(amount > 0, PoolError::InvalidPoolRewardAmountAdded);
+
+    // Transfer from reward authority -> pool vault
+    transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.from.to_account_info(),
+                to: ctx.accounts.pool_vault.to_account_info(),
+                authority: ctx.accounts.authority.to_account_info(),
+            },
+        ),
+        amount,
+    )?;
+
+    // Increase the reward distribution pool
+    ctx.accounts.pool.total_tax_collected = ctx
+        .accounts
+        .pool
+        .total_tax_collected
+        .checked_add(amount)
+        .ok_or(StakingError::MathOverflow)?;
+
+    emit!(ManualRewardAddedEvent {
+        authority: ctx.accounts.authority.key(),
+        amount,
+        timestamp: Clock::get()?.unix_timestamp,
+    });
+
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct AddRewards<'info> {
+    /// Global config
+    #[account(seeds = [CONFIG_SEED], bump)]
+    pub config: Box<Account<'info, Config>>,
+
+    /// Pool PDA
+    #[account(mut, seeds = [POOL_SEED], bump)]
+    pub pool: Box<Account<'info, StakingPool>>,
+
+    /// Authority (must match config.authority)
+    #[account(
+        mut,
+        constraint = authority.key() == config.authority @ StakingError::Unauthorized
+    )]
+    pub authority: Signer<'info>,
+
+    /// From ATA (authority’s token account)
+    #[account(
+        mut,
+        associated_token::mint = config.token_mint,
+        associated_token::authority = authority,
+    )]
+    pub from: Box<Account<'info, TokenAccount>>,
+
+    /// Pool vault
+    #[account(
+        mut,
+        associated_token::mint = config.token_mint,
+        associated_token::authority = pool,
+    )]
+    pub pool_vault: Box<Account<'info, TokenAccount>>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
