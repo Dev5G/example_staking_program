@@ -160,22 +160,19 @@ pub struct Unstake<'info> {
         associated_token::authority = pool
     )]
     pub pool_vault: Box<Account<'info, TokenAccount>>,
+    /// the community wallet to receive tax (must be a valid wallet)
+    /// CHECK: This is not dangerous because we only check the key against config
+    #[account(
+        constraint = community_wallet.key() == config.community_wallet @ ConfigError::InvalidCommunityWallet
+    )]
     /// Community wallet ATA to receive tax
     #[account(
         mut,
         associated_token::mint = config.token_mint,
-        associated_token::authority = community_wallet,
-        constraint = community_ata.owner == community_wallet.key() @ StakingError::Unauthorized,
-        constraint = community_ata.mint == config.token_mint @ StakingError::VaultMintMismatch,
+        associated_token::authority = community_wallet.key(),
     )]
     pub community_ata: Box<Account<'info, TokenAccount>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    /// the community wallet to receive tax (must be a valid wallet)
-    #[account(
-        mut,
-        constraint = community_wallet.key() == config.community_wallet @ ConfigError::InvalidCommunityWallet
-    )]
-    pub community_wallet: AccountInfo<'info>,
+    pub community_wallet: UncheckedAccount<'info>,
     /// Programs
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,

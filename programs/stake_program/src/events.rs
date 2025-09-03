@@ -44,3 +44,10 @@ pub struct InitializedEvent {
     pub community_wallet: Pubkey,
     pub timestamp: i64,
 }
+
+#[event]
+pub struct ManualRewardAddedEvent {
+    pub authority: Pubkey,
+    pub amount: u64,
+    pub timestamp: i64,
+}
