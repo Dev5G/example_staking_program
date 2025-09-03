@@ -19,7 +19,7 @@ security_txt! {
     name: "Bawls Staking Program",
     project_url: "https://bawlsonu.life",
     contacts: "Discord:@0x_skuld,X: @0x_skuld, Tg: @SkuldHub",
-    // policy: "https://myproject.com/security-policy",
+    policy: "https://bawlsonu.life/security-policy",
 
     // Optional Fields
     // preferred_languages: "en,de",
